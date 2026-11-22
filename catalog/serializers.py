@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from catalog.models import Category, Product, ProductImage, ProductOption, ProductOptionGroup, ShopBrand
@@ -90,6 +92,12 @@ class CategoryAdminSerializer(serializers.ModelSerializer):
 
 
 class ProductAdminSerializer(serializers.ModelSerializer):
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.00'))
+    promotional_price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=Decimal('0.00'), allow_null=True, required=False,
+    )
+    minimum_quantity = serializers.IntegerField(min_value=1)
+
     class Meta:
         model = Product
         fields = [
@@ -128,6 +136,8 @@ class OptionGroupAdminSerializer(serializers.ModelSerializer):
 
 
 class OptionAdminSerializer(serializers.ModelSerializer):
+    additional_price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.00'))
+
     class Meta:
         model = ProductOption
         fields = ['id', 'group', 'name', 'additional_price', 'is_active', 'sort_order']
