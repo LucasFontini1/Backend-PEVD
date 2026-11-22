@@ -23,11 +23,11 @@ class TicketSerializer(serializers.ModelSerializer):
 class TicketCreateSerializer(serializers.Serializer):
     subject = serializers.CharField(min_length=4, max_length=180)
     message = serializers.CharField(min_length=5, max_length=4000)
-    order_id = serializers.IntegerField(min_value=1, required=False)
+    order_public_id = serializers.UUIDField(required=False)
 
-    def validate_order_id(self, value):
+    def validate_order_public_id(self, value):
         request = self.context['request']
-        if not Order.objects.filter(pk=value, user=request.user).exists():
+        if not Order.objects.filter(public_id=value, user=request.user).exists():
             raise serializers.ValidationError('Pedido não encontrado.')
         return value
 
