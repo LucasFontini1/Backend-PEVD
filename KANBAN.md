@@ -1,24 +1,21 @@
 # Kanban — Pensei em Você Doces (Backend)
 
-Este quadro Markdown registra a evolução. Não há GitHub Project nativo criado pela conexão atual.
+A conexão GitHub disponível gerencia issues e PRs, mas não cria um GitHub Project nativo; este arquivo acompanha o quadro.
 
-## Concluído em dev — Fase 3
-- [#12](https://github.com/LucasFontini1/Backend-PEVD/issues/12) Address, DeliveryZone, BusinessHour, BlockedDate, Order, OrderItem, Option snapshot e OrderStatusHistory.
-- [#13](https://github.com/LucasFontini1/Backend-PEVD/issues/13) Serviço transacional de cotação e criação com Decimal e idempotência.
-- [#14](https://github.com/LucasFontini1/Backend-PEVD/issues/14) Pedidos privados, acesso por dono, histórico e cancelamento autorizado.
-- [#15](https://github.com/LucasFontini1/Backend-PEVD/issues/15) Gestão de entrega, agenda, transições e pagamento manual.
-- [PR #16](https://github.com/LucasFontini1/Backend-PEVD/pull/16) Merge para dev, CI Python 3.14 Ubuntu/Windows.
+## Concluído em dev — Fase 4
+- [#18](https://github.com/LucasFontini1/Backend-PEVD/issues/18): FAQ pública e CRUD superuser.
+- [#19](https://github.com/LucasFontini1/Backend-PEVD/issues/19): contato antispam básico, tickets privados, respostas, histórico e IDOR.
+- [#20](https://github.com/LucasFontini1/Backend-PEVD/issues/20): orçamentos com proposta e aceite, sem criar pedido automaticamente.
+- [#21](https://github.com/LucasFontini1/Backend-PEVD/issues/21): dashboard real, loja configurável, banners e auditoria.
+- [PR #22](https://github.com/LucasFontini1/Backend-PEVD/pull/22): integrado na dev com CI Python 3.14 Ubuntu/Windows.
 
-## Em homologação
-- [#17](https://github.com/LucasFontini1/Backend-PEVD/issues/17) Concorrência/retries PostgreSQL, HTTPS e regras comerciais reais.
+## Em homologação / backlog
+- [#23](https://github.com/LucasFontini1/Backend-PEVD/issues/23): antispam distribuído, email real opcional, retenção/privacidade.
+- [#24](https://github.com/LucasFontini1/Backend-PEVD/issues/24): converter orçamento aceito em pedido apenas após confirmar valor/horário/entrega.
+- [#17](https://github.com/LucasFontini1/Backend-PEVD/issues/17): validação Fase 3 em PostgreSQL e HTTPS.
+- [#2](https://github.com/LucasFontini1/Backend-PEVD/issues/2), [#3](https://github.com/LucasFontini1/Backend-PEVD/issues/3), [#5](https://github.com/LucasFontini1/Backend-PEVD/issues/5): pendências de segurança/autenticação da Fase 1.
 
-## Pendências anteriores — Fase 1
-- [#2](https://github.com/LucasFontini1/Backend-PEVD/issues/2) Revisão de cookies e proteção da sessão em hosting real.
-- [#3](https://github.com/LucasFontini1/Backend-PEVD/issues/3) Verificação de email, reset e termos versionados.
-- [#5](https://github.com/LucasFontini1/Backend-PEVD/issues/5) Rate limiting robusto e endurecimento produção.
+## Próxima fase
+- Fase 5: PWA com cache público seguro, SEO, páginas legais revisadas, deploy e auditoria completa.
 
-## Em espera
-- Fase 4: FAQ/tickets, orçamentos sob medida, conteúdo e dashboard.
-- Fase 5: PWA seguro, SEO e auditoria de publicação.
-
-**Não integrar main até homologação integral.** Sem gateway nem PIX fictício.
+**main bloqueada até homologação.** Não assumir receita conciliada, prazo de resposta, email ou dados comerciais não configurados.
