@@ -1,0 +1,54 @@
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
+
+from storefront.routers import admin_router as storefront_admin_router, public_router as storefront_public_router
+from storefront.views.dashboard import DashboardView
+from support.routers import public_router as support_public_router, client_router as support_client_router, admin_router as support_admin_router
+from support.views.public import ContactView
+from orders.routers import client_router as orders_client_router, admin_router as orders_admin_router
+from orders.views.schedule import ScheduleView
+from catalog.brand_views import AdminBrandView, PublicBrandView
+from catalog.routers import admin_router as catalog_admin_router, public_router as catalog_public_router
+from core.views import CustomTokenVerifyView, UserViewSet
+from core.views.commercial import CommercialAccessView
+from core.views.registration import StoreRegistrationView
+from core.views.session import CookieLoginView, CookieLogoutView, CookieRefreshView, CsrfBootstrapView
+from uploader.router import router as uploader_router
+
+router = DefaultRouter()
+router.register(r'usuarios', UserViewSet, basename='usuarios')
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/token/', CookieLoginView.as_view(), name='token_obtain_pair'),
+    path('api/token/csrf/', CsrfBootstrapView.as_view(), name='token_csrf'),
+    path('api/token/refresh/', CookieRefreshView.as_view(), name='token_refresh'),
+    path('api/token/logout/', CookieLogoutView.as_view(), name='token_logout'),
+    path('api/token/verify/', CustomTokenVerifyView.as_view(), name='token_verify'),
+    path('api/registro/', StoreRegistrationView.as_view(), name='user_registration'),
+    path('api/admin/access/', CommercialAccessView.as_view(), name='commercial_access'),
+    path('api/shop/settings/', PublicBrandView.as_view(), name='shop-settings'),
+    path('api/admin/shop-settings/', AdminBrandView.as_view(), name='admin-shop-settings'),
+    path('api/media/', include(uploader_router.urls)),
+    path('api/admin/', include(catalog_admin_router.urls)),
+    path('api/admin/', include(orders_admin_router.urls)),
+    path('api/schedule/', ScheduleView.as_view(), name='schedule'),
+    path('api/contact/', ContactView.as_view(), name='public-contact'),
+    path('api/admin/dashboard/', DashboardView.as_view(), name='admin-dashboard'),
+    path('api/admin/', include(storefront_admin_router.urls)),
+    path('api/', include(storefront_public_router.urls)),
+    path('api/admin/', include(support_admin_router.urls)),
+    path('api/', include(support_public_router.urls)),
+    path('api/', include(support_client_router.urls)),
+    path('api/', include(orders_client_router.urls)),
+    path('api/', include(catalog_public_router.urls)),
+    path('api/', include(router.urls)),
+]
+if settings.DEBUG and not settings.CLOUDINARY_URL:
+    urlpatterns += static(settings.MEDIA_ENDPOINT, document_root=settings.MEDIA_ROOT)
