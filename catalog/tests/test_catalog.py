@@ -125,3 +125,11 @@ class CatalogApiTests(TestCase):
             'price': '10.00',
         }, format='json')
         self.assertEqual(response.status_code, 403)
+
+    def test_price_filter_uses_promotional_price(self):
+        self.product.promotional_price = Decimal('9.50')
+        self.product.save(update_fields=['promotional_price'])
+        response = self.client.get('/api/products/?max_price=10.00')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['effective_price'], '9.50')
