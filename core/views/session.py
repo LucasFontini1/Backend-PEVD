@@ -33,6 +33,9 @@ class CookieLoginView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    def get_authenticate_header(self, request):
+        return 'Bearer realm="api"'
+
     def post(self, request):
         serializer = EmailOrUsernameTokenSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
