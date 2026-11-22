@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from core.permissions import IsActiveSuperUser
 from support.models import CustomQuote
-from support.serializers.quotes import QuoteProposalSerializer, QuoteRequestSerializer, QuoteSerializer
+from support.serializers.quotes import AdminQuoteSerializer, QuoteProposalSerializer, QuoteRequestSerializer, QuoteSerializer
 from support.services.audit import record_action
 
 
@@ -56,7 +56,7 @@ class ClientQuoteViewSet(viewsets.ReadOnlyModelViewSet):
 class AdminQuoteViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsActiveSuperUser]
     queryset = CustomQuote.objects.all()
-    serializer_class = QuoteSerializer
+    serializer_class = AdminQuoteSerializer
 
     @action(detail=True, methods=['post'], url_path='propose')
     @transaction.atomic
