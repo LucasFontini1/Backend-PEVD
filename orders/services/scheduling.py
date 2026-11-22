@@ -36,13 +36,11 @@ def validate_schedule(user, scheduled_at, fulfillment_type, address_id, products
         zone for zone in DeliveryZone.objects.filter(is_active=True).order_by('-zip_prefix')
         if zip_code.startswith(zone.zip_prefix)
     ), None)
-    if not zone:
-        raise ValidationError({'address_id': 'Entrega não disponível para este CEP.'})
-    if subtotal < zone.minimum_order:
+    if zone and subtotal < zone.minimum_order:
         raise ValidationError({'items': 'Pedido abaixo do valor mínimo da região.'})
     snapshot = {
         'label': address.label, 'zip_code': address.zip_code, 'street': address.street,
         'number': address.number, 'complement': address.complement,
         'district': address.district, 'city': address.city, 'state': address.state,
     }
-    return snapshot, zone.fee
+    return snapshot, zone.fee if zone else 0
