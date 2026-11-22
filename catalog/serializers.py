@@ -145,25 +145,33 @@ class OptionAdminSerializer(serializers.ModelSerializer):
 
 class ShopBrandPublicSerializer(serializers.ModelSerializer):
     logo = ImagePublicSerializer(read_only=True)
+    hero_image = ImagePublicSerializer(read_only=True)
 
     class Meta:
         model = ShopBrand
-        fields = ['name', 'logo', 'background_color', 'primary_color', 'heading_color', 'business_email', 'phone', 'pickup_address', 'instagram_url', 'announcement', 'response_hours']
+        fields = ['name', 'logo', 'hero_image', 'background_color', 'primary_color', 'heading_color', 'business_email', 'phone', 'pickup_address', 'instagram_url', 'announcement', 'response_hours']
 
 
 class ShopBrandAdminSerializer(ShopBrandPublicSerializer):
+    hero_image_attachment_key = serializers.SlugRelatedField(
+        source='hero_image', queryset=Image.objects.all(), slug_field='attachment_key',
+        write_only=True, required=False, allow_null=True,
+    )
     logo_attachment_key = serializers.SlugRelatedField(
         source='logo', queryset=Image.objects.all(), slug_field='attachment_key',
         write_only=True, required=False, allow_null=True,
     )
 
     class Meta(ShopBrandPublicSerializer.Meta):
-        fields = [*ShopBrandPublicSerializer.Meta.fields, 'logo_attachment_key']
+        fields = [*ShopBrandPublicSerializer.Meta.fields, 'logo_attachment_key', 'hero_image_attachment_key']
 
     def validate_instagram_url(self, value):
         if value and not value.startswith('https://www.instagram.com/'):
             raise serializers.ValidationError('Use um link HTTPS do Instagram.')
         return value
+
+    def validate_hero_image_attachment_key(self, value):
+        return validate_image_ownership(value, self.context)
 
     def validate_logo_attachment_key(self, value):
         return validate_image_ownership(value, self.context)
