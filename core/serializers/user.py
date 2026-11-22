@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             raise serializers.ValidationError('Faça login para associar uma foto.')
-        if value.owner_id != request.user.pk and not request.user.is_staff:
+        if value.owner_id != request.user.pk and not request.user.is_superuser:
             raise serializers.ValidationError('Esta imagem não pertence ao usuário autenticado.')
         return value
 

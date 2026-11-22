@@ -16,7 +16,7 @@ class UserViewSet(ModelViewSet):
     http_method_names = ['get', 'patch', 'head', 'options']
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.request.user.is_superuser:
             return User.objects.all().order_by('id')
         return User.objects.filter(pk=self.request.user.pk)
 
