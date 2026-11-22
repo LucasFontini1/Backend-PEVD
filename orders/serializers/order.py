@@ -25,8 +25,12 @@ class HistorySerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    customer_name = serializers.SerializerMethodField()
     items = SnapshotItemSerializer(many=True, read_only=True)
     history = HistorySerializer(many=True, read_only=True)
+
+    def get_customer_name(self, obj):
+        return customer_display_name(obj)
 
     class Meta:
         model = Order
