@@ -8,13 +8,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('orders', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        migrations.AddConstraint(
-            model_name='order',
-            constraint=models.UniqueConstraint(
-                fields=['idempotency_key'], condition=Q(source='whatsapp'),
-                name='unique_manual_order_key',
-            ),
-        ),
     ]
 
     operations = [
@@ -38,5 +31,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order', name='customer_phone',
             field=models.CharField(max_length=20, blank=True),
+        ),
+        migrations.AddConstraint(
+            model_name='order',
+            constraint=models.UniqueConstraint(
+                fields=['idempotency_key'], condition=Q(source='whatsapp'),
+                name='unique_manual_order_key',
+            ),
         ),
     ]
