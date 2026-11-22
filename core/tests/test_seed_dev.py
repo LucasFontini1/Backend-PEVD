@@ -22,18 +22,21 @@ class SeedDevCommandTests(TestCase):
 
     @override_settings(DEBUG=False)
     def test_seed_refuses_production(self):
-        with patch.dict(os.environ, {'DEV_SEED_ADMIN_PASSWORD': 'StrongDevPass#2026'}):
-            with self.assertRaises(CommandError):
-                call_command('seed_dev', confirm_local=True)
+        with (
+            patch.dict(os.environ, {'DEV_SEED_ADMIN_PASSWORD': 'StrongDevPass#2026'}),
+            self.assertRaises(CommandError),
+        ):
+            call_command('seed_dev', confirm_local=True)
 
     @override_settings(DEBUG=True)
     def test_requires_explicit_confirmation_and_password(self):
-        with patch.dict(os.environ, {'DEV_SEED_ADMIN_PASSWORD': 'StrongDevPass#2026'}):
-            with self.assertRaises(CommandError):
-                call_command('seed_dev')
-        with patch.dict(os.environ, {'DEV_SEED_ADMIN_PASSWORD': ''}):
-            with self.assertRaises(CommandError):
-                call_command('seed_dev', confirm_local=True)
+        with (
+            patch.dict(os.environ, {'DEV_SEED_ADMIN_PASSWORD': 'StrongDevPass#2026'}),
+            self.assertRaises(CommandError),
+        ):
+            call_command('seed_dev')
+        with patch.dict(os.environ, {'DEV_SEED_ADMIN_PASSWORD': ''}), self.assertRaises(CommandError):
+            call_command('seed_dev', confirm_local=True)
 
     def test_fixture_has_unusable_placeholder_password(self):
         import json
