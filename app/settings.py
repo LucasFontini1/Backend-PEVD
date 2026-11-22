@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'core',
     'catalog',
     'orders',
+    'support',
+    'storefront',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,6 +107,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'app.pagination.CustomPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_THROTTLE_RATES': {'contact': '5/hour'},
 }
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Django DRF PDM — API',
@@ -130,7 +133,7 @@ SIMPLE_JWT.update({
 })
 SPECTACULAR_SETTINGS.update({
     'TITLE': 'Pensei em Você Doces — API',
-    'DESCRIPTION': 'Autenticação, catálogo e administração de produtos; pedidos são fase futura.',
+    'DESCRIPTION': 'Autenticação, catálogo, pedidos, atendimento e administração comercial.',
 })
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'

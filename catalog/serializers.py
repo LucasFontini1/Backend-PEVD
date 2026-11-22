@@ -148,7 +148,7 @@ class ShopBrandPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShopBrand
-        fields = ['name', 'logo', 'background_color', 'primary_color', 'heading_color']
+        fields = ['name', 'logo', 'background_color', 'primary_color', 'heading_color', 'business_email', 'phone', 'pickup_address', 'instagram_url', 'announcement', 'response_hours']
 
 
 class ShopBrandAdminSerializer(ShopBrandPublicSerializer):
@@ -159,6 +159,11 @@ class ShopBrandAdminSerializer(ShopBrandPublicSerializer):
 
     class Meta(ShopBrandPublicSerializer.Meta):
         fields = [*ShopBrandPublicSerializer.Meta.fields, 'logo_attachment_key']
+
+    def validate_instagram_url(self, value):
+        if value and not value.startswith('https://www.instagram.com/'):
+            raise serializers.ValidationError('Use um link HTTPS do Instagram.')
+        return value
 
     def validate_logo_attachment_key(self, value):
         return validate_image_ownership(value, self.context)
