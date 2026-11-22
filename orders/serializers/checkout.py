@@ -26,7 +26,4 @@ class CheckoutSerializer(serializers.Serializer):
     def validate(self, data):
         if data['fulfillment_type'] == 'delivery' and not data.get('address_id'):
             raise serializers.ValidationError({'address_id': 'Endereço obrigatório para entrega.'})
-        ids = [line['product_id'] for line in data['items']]
-        if len(ids) != len(set(ids)):
-            raise serializers.ValidationError({'items': 'Agrupe quantidades do mesmo produto em uma linha.'})
         return data
