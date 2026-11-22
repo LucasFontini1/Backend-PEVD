@@ -14,8 +14,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'development-only-replace-this-secret-key')
 if not DEBUG and SECRET_KEY == 'development-only-replace-this-secret-key':
     raise RuntimeError('Defina SECRET_KEY antes de iniciar em produção.')
 DJANGO_ADMIN_PATH = os.getenv('DJANGO_ADMIN_PATH', 'admin/' if DEBUG else '').strip().strip('/')
-if not DEBUG and (not DJANGO_ADMIN_PATH or DJANGO_ADMIN_PATH in {'admin', 'api'}):
-    raise RuntimeError('Configure DJANGO_ADMIN_PATH com caminho exclusivo em produção (sem / inicial).')
+if not DEBUG and DJANGO_ADMIN_PATH in {'admin', 'api'}:
+    raise RuntimeError('DJANGO_ADMIN_PATH deve ser exclusivo em produção; use um caminho não padrão.')
 if DJANGO_ADMIN_PATH and (not all(c.isalnum() or c in '-_' for c in DJANGO_ADMIN_PATH) or len(DJANGO_ADMIN_PATH) > 80):
     raise RuntimeError('DJANGO_ADMIN_PATH inválido; use letras, números, hífen ou underscore.')
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
