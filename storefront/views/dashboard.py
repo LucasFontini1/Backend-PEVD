@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
@@ -56,7 +57,7 @@ class DashboardView(APIView):
             'period': {'start': str(start) if start else None, 'end': str(end) if end else None},
             'orders_count': orders.count(),
             'paid_orders_count': paid.count(),
-            'recorded_paid_revenue': str(paid.aggregate(total=Sum('total'))['total'] or 0),
+            'recorded_paid_revenue': str(Decimal(paid.aggregate(total=Sum('total'))['total'] or 0).quantize(Decimal('0.01'))),
             'contacts_count': contacts.count(),
             'open_tickets_count': tickets.filter(status=SupportTicket.Status.OPEN).count(),
             'quotes_pending_count': quotes.filter(status=CustomQuote.Status.REQUESTED).count(),
