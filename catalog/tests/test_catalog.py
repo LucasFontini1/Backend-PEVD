@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from catalog.models import Category, Product
+from catalog.models import Category, Product, ProductOptionGroup
+from uploader.models import Image
 
 User = get_user_model()
 
@@ -78,3 +79,49 @@ class CatalogApiTests(TestCase):
             f'/api/admin/products/{self.product.pk}/', {'promotional_price': '100.00'}, format='json',
         )
         self.assertEqual(result.status_code, 400)
+
+    def test_admin_image_and_options_reach_public_detail(self):
+        self.client.force_authenticate(user=self.admin)
+        image = Image.objects.create(owner=self.admin, file='images/test-public.png', description='Foto teste')
+        uploaded = self.client.post('/api/admin/product-images/', {
+            'product': self.product.pk, 'image_attachment_key': str(image.attachment_key),
+            'alt_text': 'Imagem ilustrativa do teste',
+        }, format='json')
+        self.assertEqual(uploaded.status_code, 201, uploaded.data)
+        group = self.client.post('/api/admin/option-groups/', {
+            'product': self.product.pk, 'name': 'Tamanho', 'required': True,
+        }, format='json')
+        self.assertEqual(group.status_code, 201, group.data)
+        option = self.client.post('/api/admin/options/', {
+            'group': group.data['id'], 'name': 'Grande', 'additional_price': '4.50',
+        }, format='json')
+        self.assertEqual(option.status_code, 201, option.data)
+        public = self.client.get('/api/products/produto-teste/')
+        self.assertEqual(public.status_code, 200)
+        self.assertEqual(public.data['images'][0]['alt_text'], 'Imagem ilustrativa do teste')
+        self.assertEqual(public.data['option_groups'][0]['options'][0]['additional_price'], '4.50')
+
+    def test_cannot_associate_another_user_image(self):
+        self.client.force_authenticate(user=self.admin)
+        foreign = Image.objects.create(owner=self.user, file='images/not-owned.png')
+        response = self.client.post('/api/admin/product-images/', {
+            'product': self.product.pk, 'image_attachment_key': str(foreign.attachment_key),
+            'alt_text': 'Não autorizado',
+        }, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_option_price_cannot_be_negative(self):
+        self.client.force_authenticate(user=self.admin)
+        group = ProductOptionGroup.objects.create(product=self.product, name='Sabor')
+        result = self.client.post('/api/admin/options/', {
+            'group': group.pk, 'name': 'Teste', 'additional_price': '-1.00',
+        }, format='json')
+        self.assertEqual(result.status_code, 400)
+
+    def test_staff_cannot_upload_to_catalog(self):
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.post('/api/admin/products/', {
+            'name': 'Bloqueado', 'slug': 'bloqueado', 'category': self.category.pk,
+            'price': '10.00',
+        }, format='json')
+        self.assertEqual(response.status_code, 403)
