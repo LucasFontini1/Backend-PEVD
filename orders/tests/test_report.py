@@ -60,6 +60,23 @@ class CompletedReportTests(TestCase):
         self.assertEqual(result.status_code, 200, result.data)
         self.assertEqual(result.data['orders_count'], 2)
 
+    def test_registered_customer_name_in_json_and_csv(self):
+        linked = Order.objects.filter(status=Order.Status.COMPLETED).first()
+        linked.source = Order.Source.SITE
+        linked.user = self.admin
+        linked.customer_name = ''
+        linked.save(update_fields=['source', 'user', 'customer_name'])
+        self.admin.name = 'Maria da Silva'
+        self.admin.save(update_fields=['name'])
+        self.client.force_authenticate(user=self.admin)
+        report = self.client.get('/api/admin/orders/completed-report/')
+        self.assertEqual(report.status_code, 200, report.data)
+        current = next(x for x in report.data['results'] if x['public_id'] == str(linked.public_id))
+        self.assertEqual(current['customer_display_name'], 'Maria da Silva')
+        self.assertEqual(current['customer_name'], 'Maria da Silva')
+        csv_result = self.client.get('/api/admin/orders/completed-report/?download=csv')
+        self.assertIn('Maria da Silva', csv_result.content.decode('utf-8-sig'))
+
     def test_csv_export_and_period(self):
         self.client.force_authenticate(user=self.admin)
         csv_response = self.client.get('/api/admin/orders/completed-report/?download=csv')
