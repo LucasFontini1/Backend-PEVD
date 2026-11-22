@@ -59,3 +59,8 @@ ignore = ["RUF012", "I001"]
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F401"]
 "manage.py" = ["EXE001"]
+
+# Vercel executa o script somente no build de produção.
+# Configure DATABASE_URL_MIGRATIONS com o Session Pooler do Supabase.
+[tool.vercel.scripts]
+"vercel-build" = "sh -c 'if [ \"$VERCEL_ENV\" = production ]; then test -n \"$DATABASE_URL_MIGRATIONS\" || { echo DATABASE_URL_MIGRATIONS ausente; exit 1; }; DATABASE_URL=\"$DATABASE_URL_MIGRATIONS\" python manage.py migrate --noinput; fi'"
