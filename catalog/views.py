@@ -1,6 +1,7 @@
 from decimal import Decimal, InvalidOperation
 
 from django.db.models import Q
+from django.db.models.functions import Coalesce
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
@@ -31,7 +32,7 @@ class ProductPublicViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super().get_queryset().annotate(catalog_price=Coalesce('promotional_price', 'price'))
         p = self.request.query_params
         if p.get('search'):
             qs = qs.filter(Q(name__icontains=p['search']) | Q(description__icontains=p['search']))
@@ -49,11 +50,13 @@ class ProductPublicViewSet(viewsets.ReadOnlyModelViewSet):
                         raise ValueError()
                 except (InvalidOperation, ValueError):
                     raise ValidationError({key: 'Informe um preço decimal válido e não negativo.'}) from None
-                qs = qs.filter(**{f'price__{lookup}': price})
+                qs = qs.filter(**{f'catalog_price__{lookup}': price})
         ordering = p.get('ordering', 'sort_order')
         allowed = {'sort_order', 'name', '-name', 'price', '-price'}
         if ordering not in allowed:
             raise ValidationError({'ordering': 'Ordenação não permitida.'})
+        if ordering.lstrip('-') == 'price':
+            ordering = ordering.replace('price', 'catalog_price')
         return qs.order_by(ordering, 'id')
 
 
