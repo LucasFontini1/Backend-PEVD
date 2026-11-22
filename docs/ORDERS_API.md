@@ -11,6 +11,7 @@ Implementação em `orders/` (models, serializers, views, services, tests), pres
 - `POST /api/orders/` — cria pedido a partir da mesma seleção, com `idempotency_key` UUID e `quote_hash`, retorna 201; replay idêntico retorna 200 sem segundo pedido.
 - `GET /api/orders/` — somente próprios.
 - `GET /api/orders/{public_id}/` — somente proprietário; recursos de terceiros retornam 404.
+- `POST /api/orders/{public_id}/cancel-request/` — cancela o próprio pedido se ainda estiver em `aguardando_confirmacao`, registrando histórico; outros estados exigem atendimento.
 
 ### Exemplo de cotação (IDs ilustrativos, não são produtos reais)
 ```json
