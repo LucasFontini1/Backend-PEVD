@@ -1,21 +1,22 @@
 # Kanban — Pensei em Você Doces (Backend)
 
-> Quadro em Markdown para acompanhar as issues. **Não substitui um GitHub Project nativo.**
+> Quadro de acompanhamento em Markdown. **Ainda não é um GitHub Project nativo**, pois o conector não oferece sua criação.
 
 ## Backlog
-- [#3](https://github.com/LucasFontini1/Backend-PEVD/issues/3) Verificação de e-mail, recuperação de senha, aceite versionado
-- [#5](https://github.com/LucasFontini1/Backend-PEVD/issues/5) Rate limit distribuído, OpenAPI e validação
+- [#3](https://github.com/LucasFontini1/Backend-PEVD/issues/3) Verificação de email, recuperação de senha e aceite versionado
+- [#5](https://github.com/LucasFontini1/Backend-PEVD/issues/5) Rate limiting distribuído, OpenAPI e validações de produção
 
 ## To do
-- [#4](https://github.com/LucasFontini1/Backend-PEVD/issues/4) Testar autorização e permissões comerciais
+- Testar e revisar sessão em HTTPS/staging; confirmar segurança cross-domain e logout
 
 ## In progress
-- [#2](https://github.com/LucasFontini1/Backend-PEVD/issues/2) Sessão JWT/CSRF/logout — [PR #7](https://github.com/LucasFontini1/Backend-PEVD/pull/7) (rascunho)
+- [#2](https://github.com/LucasFontini1/Backend-PEVD/issues/2) Fortalecer JWT/CSRF e rotinas de sessão
 
 ## In review
-- Testes CI de autenticação da PR #7
+- Validação integrada frontend/backend da Fase 1
 
-## Done (integração em dev, não em main)
-- [#1](https://github.com/LucasFontini1/Backend-PEVD/issues/1) Template copiado integralmente — [PR #6](https://github.com/LucasFontini1/Backend-PEVD/pull/6)
+## Done (em dev, não em main)
+- [#1](https://github.com/LucasFontini1/Backend-PEVD/issues/1) Template importado e preservado — PR #6
+- [#4](https://github.com/LucasFontini1/Backend-PEVD/issues/4) Permissão comercial 401/403 — PR #7
 
-Fluxo: `main` → `dev` → `FEAT-N` (a partir de `dev`) → PR para `dev`. Não promover para main sem testes.
+Fluxo: `main` estável, `dev` para integração, `FEAT-N` a partir de dev. Não integrar main antes da Fase 1 validada.
