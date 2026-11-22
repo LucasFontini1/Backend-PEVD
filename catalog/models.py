@@ -106,6 +106,7 @@ class ShopBrand(models.Model):
     """Identidade visual pública; somente a conta comercial pode alterar."""
     name = models.CharField(max_length=120, default='Pensei em Você Doces')
     logo = models.ForeignKey('uploader.Image', on_delete=models.SET_NULL, null=True, blank=True)
+    hero_image = models.ForeignKey('uploader.Image', on_delete=models.SET_NULL, null=True, blank=True, related_name='hero_for_shops')
     background_color = models.CharField(max_length=7, default='#FFF5E9')
     primary_color = models.CharField(max_length=7, default='#C96680')
     heading_color = models.CharField(max_length=7, default='#704438')
