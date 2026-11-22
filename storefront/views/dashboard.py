@@ -1,8 +1,6 @@
-from datetime import date, datetime
+from datetime import date
 
-from django.db.models import Count, Sum
-from django.db.models.functions import Coalesce
-from django.utils import timezone
+from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
