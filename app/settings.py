@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'uploader',
     'core',
     'catalog',
+    'orders',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
