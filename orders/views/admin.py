@@ -74,4 +74,4 @@ class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
         if not isinstance(reason, str) or not reason.strip() or len(reason) > 200:
             raise serializers.ValidationError({'reason': 'Informe a confirmação manual do pagamento.'})
         order = confirm_manual_payment(self.get_object().pk, request.user, reason)
-        return Response(OrderSerializer(order).data)
+        return Response(AdminOrderSerializer(order).data)
