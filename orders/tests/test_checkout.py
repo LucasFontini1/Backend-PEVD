@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, time
+from datetime import timedelta, time
 from decimal import Decimal
 from uuid import uuid4
 
@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from catalog.models import Category, Product, ProductOption, ProductOptionGroup
-from orders.models import BusinessHour, CustomerAddress, DeliveryZone, Order
+from orders.models import BusinessHour, Order
 
 User = get_user_model()
 
