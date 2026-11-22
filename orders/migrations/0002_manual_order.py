@@ -1,12 +1,20 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db.models import Q
 
 
 class Migration(migrations.Migration):
     dependencies = [
         ('orders', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        migrations.AddConstraint(
+            model_name='order',
+            constraint=models.UniqueConstraint(
+                fields=['idempotency_key'], condition=Q(source='whatsapp'),
+                name='unique_manual_order_key',
+            ),
+        ),
     ]
 
     operations = [

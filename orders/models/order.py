@@ -52,6 +52,7 @@ class Order(models.Model):
         ordering = ['-created_at']
         constraints = [
             models.UniqueConstraint(fields=['user', 'idempotency_key'], name='unique_order_idempotency_per_user'),
+            models.UniqueConstraint(fields=['idempotency_key'], condition=Q(source='whatsapp'), name='unique_manual_order_key'),
             models.CheckConstraint(condition=Q(total__gte=0), name='order_total_nonnegative'),
         ]
 
