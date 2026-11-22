@@ -1,5 +1,6 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -39,7 +40,6 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     def cancel_request(self, request, public_id=None):
         order = self.get_object()
         if order.status != Order.Status.WAITING:
-            from rest_framework.exceptions import ValidationError
             raise ValidationError({'status': 'Cancelamento direto permitido apenas antes da confirmação.'})
         updated = transition_order(order.pk, request.user, Order.Status.CANCELLED, 'Cancelado pelo cliente')
         return Response(OrderSerializer(updated).data)
