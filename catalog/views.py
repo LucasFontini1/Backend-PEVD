@@ -68,6 +68,11 @@ class CategoryAdminViewSet(BaseAdminViewSet):
     serializer_class = CategoryAdminSerializer
     queryset = Category.objects.all().select_related('image')
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        name = self.request.query_params.get('search', '').strip()
+        return qs.filter(name__icontains=name) if name else qs
+
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save(update_fields=['is_active'])
@@ -76,6 +81,11 @@ class CategoryAdminViewSet(BaseAdminViewSet):
 class ProductAdminViewSet(BaseAdminViewSet):
     serializer_class = ProductAdminSerializer
     queryset = Product.objects.all().select_related('category')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        name = self.request.query_params.get('search', '').strip()
+        return qs.filter(name__icontains=name) if name else qs
 
     def perform_destroy(self, instance):
         instance.is_active = False
