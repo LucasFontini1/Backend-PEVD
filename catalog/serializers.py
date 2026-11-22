@@ -38,7 +38,7 @@ class OptionGroupPublicSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_options(self, instance):
-        return OptionPublicSerializer(instance.options.filter(is_active=True), many=True).data
+        return OptionPublicSerializer([option for option in instance.options.all() if option.is_active], many=True).data
 
 
 class ProductImagePublicSerializer(serializers.ModelSerializer):
