@@ -64,7 +64,7 @@ TEMPLATES = [{
     ]},
 }]
 DATABASES = {'default': dj_database_url.config(
-    default='sqlite:///db.sqlite3', conn_max_age=600, conn_health_checks=True,
+    default='sqlite:///db.sqlite3', conn_max_age=0 if os.getenv('VERCEL') else 600, conn_health_checks=True,
 )}
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -135,8 +135,9 @@ SPECTACULAR_SETTINGS.update({
     'TITLE': 'Pensei em Você Doces — API',
     'DESCRIPTION': 'Autenticação, catálogo, pedidos, atendimento e administração comercial.',
 })
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+CSRF_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '0'))
