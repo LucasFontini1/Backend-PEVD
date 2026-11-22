@@ -166,3 +166,16 @@ class CheckoutTests(TestCase):
         self.assertEqual(payment.status_code, 200, payment.data)
         self.assertEqual(payment.data['payment_status'], 'pago')
         self.assertEqual(Order.objects.get(pk=pk).history.count(), 3)
+
+    def test_client_can_cancel_only_own_pending_order(self):
+        result = self.quote_and_order()
+        public_id = result.data['public_id']
+        endpoint = f'/api/orders/{public_id}/cancel-request/'
+        self.client.force_authenticate(user=self.other)
+        self.assertEqual(self.client.post(endpoint).status_code, 404)
+        self.client.force_authenticate(user=self.user)
+        cancelled = self.client.post(endpoint)
+        self.assertEqual(cancelled.status_code, 200, cancelled.data)
+        self.assertEqual(cancelled.data['status'], 'cancelado')
+        self.assertEqual(len(cancelled.data['history']), 2)
+        self.assertEqual(self.client.post(endpoint).status_code, 400)
