@@ -39,3 +39,9 @@ class QuoteProposalSerializer(serializers.Serializer):
         if value <= timezone.now():
             raise serializers.ValidationError('A validade deve ser futura.')
         return value
+
+
+class AdminQuoteSerializer(QuoteSerializer):
+    class Meta(QuoteSerializer.Meta):
+        fields = ['user', *QuoteSerializer.Meta.fields]
+        read_only_fields = fields
