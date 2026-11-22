@@ -1,3 +1,6 @@
+import re
+from decimal import Decimal
+
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,6 +12,16 @@ from orders.services.transitions import confirm_manual_payment, transition_order
 
 
 class DeliveryZoneSerializer(serializers.ModelSerializer):
+    fee = serializers.DecimalField(max_digits=9, decimal_places=2, min_value=Decimal('0.00'))
+    minimum_order = serializers.DecimalField(
+        max_digits=9, decimal_places=2, min_value=Decimal('0.00'), required=False,
+    )
+
+    def validate_zip_prefix(self, value):
+        if not re.fullmatch(r'[0-9]{1,8}', value):
+            raise serializers.ValidationError('Prefixo CEP deve conter de 1 a 8 dígitos.')
+        return value
+
     class Meta:
         model = DeliveryZone
         fields = '__all__'
