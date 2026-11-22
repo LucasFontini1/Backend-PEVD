@@ -58,6 +58,19 @@ class AdminQuoteViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CustomQuote.objects.all()
     serializer_class = AdminQuoteSerializer
 
+    @action(detail=True, methods=['post'], url_path='close')
+    @transaction.atomic
+    def close(self, request, pk=None):
+        quote = CustomQuote.objects.select_for_update().filter(pk=pk).first()
+        if quote is None:
+            raise NotFound()
+        if quote.status not in (CustomQuote.Status.REQUESTED, CustomQuote.Status.PROPOSED):
+            raise ValidationError({'status': 'Esta proposta já está encerrada.'})
+        quote.status = CustomQuote.Status.DECLINED
+        quote.save(update_fields=['status', 'updated_at'])
+        record_action(request.user, 'quote.close', quote)
+        return Response(QuoteSerializer(quote).data)
+
     @action(detail=True, methods=['post'], url_path='propose')
     @transaction.atomic
     def propose(self, request, pk=None):
