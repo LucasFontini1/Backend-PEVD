@@ -1,3 +1,5 @@
+> **Pensei em Você Doces — Fase 1 (branch FEAT-2):** este projeto deriva do template de LucasFontini1, preservando autoria e uploader. O contrato de autenticação da loja substitui a resposta JWT descrita abaixo: `POST /api/token/` devolve apenas `access` e guarda o refresh em cookie HttpOnly; detalhes em [docs/ENDPOINTS.md](docs/ENDPOINTS.md). Cadastro, login e autorização estão em validação; recuperação de senha, verificação de e-mail e rate limit de produção ainda não estão concluídos. **Não publicar/mesclar em main antes de revisar estes pontos.**
+
 # Template Django + Django REST Framework + PDM
 
 Backend reutilizável para criar APIs Django com uma estrutura próxima à do template de [Marco André Mendes](https://github.com/marrcandre/template_django_pdm), ampliada com a aplicação **uploader** do [tutorial Django DRF](https://marrcandre.github.io/django-drf-tutorial/), **foto de perfil**, **username único** e autenticação **por e-mail OU username**.

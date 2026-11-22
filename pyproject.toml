@@ -50,3 +50,12 @@ extend-exclude = ["migrations"]
 
 [tool.ruff.format]
 quote-style = "single"
+
+# Meta classes do Django/DRF usam atributos de classe mutáveis intencionalmente.
+# I001 fica temporariamente fora do lint até normalizar imports do template.
+[tool.ruff.lint]
+ignore = ["RUF012", "I001"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"manage.py" = ["EXE001"]

@@ -117,3 +117,22 @@ SIMPLE_JWT = {
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False').lower() == 'true'
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
+
+# Fase 1 — sessão e proteção da aplicação comercial.
+INSTALLED_APPS += ['rest_framework_simplejwt.token_blacklist']
+SIMPLE_JWT.update({
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+})
+SPECTACULAR_SETTINGS.update({
+    'TITLE': 'Pensei em Você Doces — API',
+    'DESCRIPTION': 'Autenticação e acesso comercial; catálogo e pedidos são fases futuras.',
+})
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
