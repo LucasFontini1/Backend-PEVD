@@ -5,6 +5,7 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from catalog.routers import admin_router as catalog_admin_router, public_router as catalog_public_router
 from core.views import CustomTokenVerifyView, UserViewSet
 from core.views.commercial import CommercialAccessView
 from core.views.registration import StoreRegistrationView
@@ -25,6 +26,8 @@ urlpatterns = [
     path('api/registro/', StoreRegistrationView.as_view(), name='user_registration'),
     path('api/admin/access/', CommercialAccessView.as_view(), name='commercial_access'),
     path('api/media/', include(uploader_router.urls)),
+    path('api/admin/', include(catalog_admin_router.urls)),
+    path('api/', include(catalog_public_router.urls)),
     path('api/', include(router.urls)),
 ]
 if settings.DEBUG and not settings.CLOUDINARY_URL:
