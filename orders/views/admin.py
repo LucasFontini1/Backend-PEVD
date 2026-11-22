@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from core.permissions import IsActiveSuperUser
 from orders.models import BlockedDate, BusinessHour, DeliveryZone, Order
-from orders.serializers import OrderSerializer
+from orders.serializers.order import AdminOrderSerializer
 from orders.services.transitions import confirm_manual_payment, transition_order
 
 
@@ -55,7 +55,7 @@ class BlockedDateViewSet(AdminBase):
 class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsActiveSuperUser]
     queryset = Order.objects.all().prefetch_related('items__options', 'history')
-    serializer_class = OrderSerializer
+    serializer_class = AdminOrderSerializer
 
     @action(detail=True, methods=['post'], url_path='transitions')
     def transitions(self, request, pk=None):
@@ -66,7 +66,7 @@ class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
         if status_value not in Order.Status.values:
             raise serializers.ValidationError({'status': 'Estado inválido.'})
         order = transition_order(self.get_object().pk, request.user, status_value, reason)
-        return Response(OrderSerializer(order).data)
+        return Response(AdminOrderSerializer(order).data)
 
     @action(detail=True, methods=['post'], url_path='confirm-payment')
     def confirm_payment(self, request, pk=None):
