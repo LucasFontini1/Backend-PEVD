@@ -100,8 +100,8 @@ class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='confirm-payment')
     def confirm_payment(self, request, pk=None):
-        reason = request.data.get('reason')
-        if not isinstance(reason, str) or not reason.strip() or len(reason) > 200:
-            raise serializers.ValidationError({'reason': 'Informe a confirmação manual do pagamento.'})
+        reason = request.data.get('reason', '')
+        if not isinstance(reason, str) or len(reason) > 200:
+            raise serializers.ValidationError({'reason': 'Observação inválida.'})
         order = confirm_manual_payment(self.get_object().pk, request.user, reason)
         return Response(AdminOrderSerializer(order).data)
