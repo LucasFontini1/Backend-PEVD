@@ -2,7 +2,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -30,7 +30,6 @@ class ClientQuoteViewSet(viewsets.ReadOnlyModelViewSet):
     def accept(self, request, pk=None):
         quote = CustomQuote.objects.select_for_update().filter(pk=pk, user=request.user).first()
         if not quote:
-            from rest_framework.exceptions import NotFound
             raise NotFound()
         if quote.status != CustomQuote.Status.PROPOSED or quote.valid_until <= timezone.now():
             raise ValidationError({'status': 'Proposta indisponível ou vencida.'})
