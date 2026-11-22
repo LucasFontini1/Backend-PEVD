@@ -10,7 +10,7 @@
 - Repetições com a mesma chave UUID retornam 200 se idênticas; outra carga gera 400.
 
 ## Relatório
-- `GET /api/admin/orders/completed-report/?start=AAAA-MM-DD&end=AAAA-MM-DD` somente status `concluido`, filtrado por **data de criação** do pedido; pedidos cancelados e apenas confirmados não entram. O resumo separa total pago e pendente; valores são declarações do sistema, não comprovantes bancários.
+- `GET /api/admin/orders/completed-report/?start=AAAA-MM-DD&end=AAAA-MM-DD` somente status `concluido`, filtrado pela **data de conclusão** registrada no histórico do pedido (fallback para criação se um registro antigo não tiver histórico de conclusão); pedidos cancelados e apenas confirmados não entram. O resumo separa total pago e pendente; valores são declarações do sistema, não comprovantes bancários.
 - `GET /api/admin/orders/completed-report/?download=csv` retorna CSV separado por ponto e vírgula, com BOM UTF-8 para Excel.
 
 Antes de produção: revisar dados pessoais guardados, fluxos de reembolso/cancelamento e conciliação real. Dados WhatsApp são inseridos pela administração e nunca importados automaticamente.

@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from orders.models import Order
+from orders.models import Order, OrderStatusHistory
 
 User = get_user_model()
 
@@ -44,6 +44,21 @@ class CompletedReportTests(TestCase):
         self.assertEqual(result.data['orders_count'], 2)
         self.assertEqual(result.data['paid_total'], '50.00')
         self.assertEqual(result.data['unpaid_total'], '30.00')
+
+    def test_period_uses_completion_date_not_creation(self):
+        self.client.force_authenticate(user=self.admin)
+        order = Order.objects.filter(status=Order.Status.COMPLETED).first()
+        Order.objects.filter(pk=order.pk).update(created_at=timezone.now() - timedelta(days=40))
+        OrderStatusHistory.objects.create(
+            order=order, actor=self.admin, previous_status=Order.Status.READY,
+            new_status=Order.Status.COMPLETED,
+        )
+        beginning = timezone.localdate() - timedelta(days=1)
+        result = self.client.get('/api/admin/orders/completed-report/', {
+            'start': beginning.isoformat(),
+        })
+        self.assertEqual(result.status_code, 200, result.data)
+        self.assertEqual(result.data['orders_count'], 2)
 
     def test_csv_export_and_period(self):
         self.client.force_authenticate(user=self.admin)
