@@ -3,7 +3,8 @@ from datetime import date
 from decimal import Decimal
 
 from django.http import HttpResponse
-from django.db.models import Sum
+from django.db.models import F, Max, Q, Sum
+from django.db.models.functions import Coalesce
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
@@ -25,12 +26,17 @@ def parse_dates(params):
 
 def completed_queryset(params):
     start, end = parse_dates(params)
-    qs = Order.objects.filter(status=Order.Status.COMPLETED)
+    qs = Order.objects.filter(status=Order.Status.COMPLETED).annotate(
+        closed_at=Coalesce(
+            Max('history__changed_at', filter=Q(history__new_status=Order.Status.COMPLETED)),
+            F('created_at'),
+        ),
+    )
     if start:
-        qs = qs.filter(created_at__date__gte=start)
+        qs = qs.filter(closed_at__date__gte=start)
     if end:
-        qs = qs.filter(created_at__date__lte=end)
-    return qs.order_by('created_at', 'pk')
+        qs = qs.filter(closed_at__date__lte=end)
+    return qs.order_by('closed_at', 'pk')
 
 
 def completed_report(request):
@@ -43,12 +49,12 @@ def completed_report(request):
         response.write('\ufeff')
         writer = csv.writer(response, delimiter=';')
         writer.writerow([
-            'Codigo', 'Data', 'Origem', 'Cliente', 'Telefone', 'Pagamento',
+            'Codigo', 'Data de conclusao', 'Origem', 'Cliente', 'Telefone', 'Pagamento',
             'Subtotal', 'Frete', 'Total',
         ])
         for order in qs.iterator():
             writer.writerow([
-                str(order.public_id), order.created_at.isoformat(), order.source,
+                str(order.public_id), order.closed_at.isoformat(), order.source,
                 order.customer_name, order.customer_phone, order.payment_status,
                 order.subtotal, order.shipping, order.total,
             ])
@@ -59,6 +65,7 @@ def completed_report(request):
         'unpaid_total': str((unpaid.aggregate(v=Sum('total'))['v'] or Decimal(0)).quantize(Decimal('0.01'))),
         'results': [{
             'public_id': str(order.public_id), 'created_at': order.created_at,
+            'completed_at': order.closed_at,
             'source': order.source, 'customer_name': order.customer_name,
             'customer_phone': order.customer_phone,
             'payment_status': order.payment_status, 'total': str(order.total),
