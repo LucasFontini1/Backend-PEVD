@@ -15,7 +15,7 @@ class Category(models.Model):
 
     class Meta:
         ordering = ['sort_order', 'name']
-        indexes = [models.Index(fields=['is_active', 'sort_order'])]
+        indexes = [models.Index(fields=['is_active', 'sort_order'], name='catalog_cat_active_order_idx')]
 
     def __str__(self):
         return self.name
@@ -42,8 +42,8 @@ class Product(models.Model):
     class Meta:
         ordering = ['sort_order', 'name']
         indexes = [
-            models.Index(fields=['is_active', 'is_available']),
-            models.Index(fields=['is_featured', 'sort_order']),
+            models.Index(fields=['is_active', 'is_available'], name='catalog_product_active_idx'),
+            models.Index(fields=['is_featured', 'sort_order'], name='catalog_product_feature_idx'),
         ]
         constraints = [
             models.CheckConstraint(condition=Q(price__gte=0), name='catalog_price_nonnegative'),
