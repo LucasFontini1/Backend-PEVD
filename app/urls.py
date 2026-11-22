@@ -16,7 +16,7 @@ from catalog.routers import admin_router as catalog_admin_router, public_router 
 from core.views import CustomTokenVerifyView, UserViewSet
 from core.views.commercial import CommercialAccessView
 from core.views.registration import StoreRegistrationView
-from core.views.session import CookieLoginView, CookieLogoutView, CookieRefreshView
+from core.views.session import CookieLoginView, CookieLogoutView, CookieRefreshView, CsrfBootstrapView
 from uploader.router import router as uploader_router
 
 router = DefaultRouter()
@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('api/token/', CookieLoginView.as_view(), name='token_obtain_pair'),
+    path('api/token/csrf/', CsrfBootstrapView.as_view(), name='token_csrf'),
     path('api/token/refresh/', CookieRefreshView.as_view(), name='token_refresh'),
     path('api/token/logout/', CookieLogoutView.as_view(), name='token_logout'),
     path('api/token/verify/', CustomTokenVerifyView.as_view(), name='token_verify'),
