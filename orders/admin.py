@@ -22,7 +22,8 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['public_id', 'user__email']
     readonly_fields = [
         'user', 'public_id', 'idempotency_key', 'request_digest', 'subtotal',
-        'shipping', 'total', 'address_snapshot', 'created_at',
+        'shipping', 'total', 'address_snapshot', 'created_at', 'status', 'payment_status',
+        'fulfillment_type', 'scheduled_at', 'notes',
     ]
     inlines = [OrderItemInline]
 
@@ -34,4 +35,16 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register([CustomerAddress, BusinessHour, BlockedDate, DeliveryZone])
-admin.site.register([OrderItemOption, OrderStatusHistory])
+class ImmutableSnapshotAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+admin.site.register(OrderItemOption, ImmutableSnapshotAdmin)
+admin.site.register(OrderStatusHistory, ImmutableSnapshotAdmin)
