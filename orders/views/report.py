@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from orders.models import Order
+from orders.services.customer_identity import customer_display_name
 
 
 def parse_dates(params):
@@ -36,7 +37,7 @@ def completed_queryset(params):
         qs = qs.filter(closed_at__date__gte=start)
     if end:
         qs = qs.filter(closed_at__date__lte=end)
-    return qs.order_by('closed_at', 'pk')
+    return qs.select_related('user').order_by('closed_at', 'pk')
 
 
 def completed_report(request):
@@ -55,7 +56,7 @@ def completed_report(request):
         for order in qs.iterator():
             writer.writerow([
                 str(order.public_id), order.closed_at.isoformat(), order.source,
-                order.customer_name, order.customer_phone, order.payment_status,
+                customer_display_name(order), order.customer_phone, order.payment_status,
                 order.subtotal, order.shipping, order.total,
             ])
         return response
@@ -66,7 +67,8 @@ def completed_report(request):
         'results': [{
             'public_id': str(order.public_id), 'created_at': order.created_at,
             'completed_at': order.closed_at,
-            'source': order.source, 'customer_name': order.customer_name,
+            'source': order.source, 'customer_name': customer_display_name(order),
+            'customer_display_name': customer_display_name(order),
             'customer_phone': order.customer_phone,
             'payment_status': order.payment_status, 'total': str(order.total),
         } for order in qs[:500]],
