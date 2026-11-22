@@ -46,7 +46,7 @@ class AuthenticationTests(TestCase):
     def test_registration_and_username_required(self):
         response = self.client.post('/api/registro/', {
             'email': 'novo@example.com', 'username': 'novo.user',
-            'password': 'UmaSenhaSegura#2026',
+            'password': 'UmaSenhaSegura#2026', 'accepted_terms': True,
         }, format='json')
         self.assertEqual(response.status_code, 201, response.data)
         self.assertNotIn('password', response.data)
