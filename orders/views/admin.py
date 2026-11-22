@@ -1,9 +1,12 @@
 import re
 from decimal import Decimal
 
-from rest_framework import serializers, viewsets
-from rest_framework.decorators import action
+from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from orders.serializers.manual import ManualOrderSerializer
+from orders.services.manual import create_manual_order
+from orders.views.report import completed_report
 
 from core.permissions import IsActiveSuperUser
 from orders.models import BlockedDate, BusinessHour, DeliveryZone, Order
@@ -69,6 +72,20 @@ class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsActiveSuperUser]
     queryset = Order.objects.all().prefetch_related('items__options', 'history')
     serializer_class = AdminOrderSerializer
+
+    @action(detail=False, methods=['post'], url_path='manual')
+    def manual(self, request):
+        serializer = ManualOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order, created = create_manual_order(request.user, serializer.validated_data)
+        return Response(
+            AdminOrderSerializer(self.get_queryset().get(pk=order.pk)).data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=['get'], url_path='completed-report')
+    def completed_report(self, request):
+        return completed_report(request)
 
     @action(detail=True, methods=['post'], url_path='transitions')
     def transitions(self, request, pk=None):

@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from orders.models import BlockedDate, BusinessHour, CustomerAddress, DeliveryZone
 
 
-def validate_schedule(user, scheduled_at, fulfillment_type, address_id, products, subtotal):
+def validate_window(scheduled_at, fulfillment_type, products):
     if scheduled_at <= timezone.now():
         raise ValidationError({'scheduled_at': 'Escolha uma data futura.'})
     local = timezone.localtime(scheduled_at)
@@ -22,7 +22,11 @@ def validate_schedule(user, scheduled_at, fulfillment_type, address_id, products
     lead_hours = max(product['product'].minimum_lead_hours for product in products)
     if scheduled_at < timezone.now() + timedelta(hours=lead_hours):
         raise ValidationError({'scheduled_at': f'É necessária antecedência de {lead_hours} horas.'})
-    if not delivery:
+
+
+def validate_schedule(user, scheduled_at, fulfillment_type, address_id, products, subtotal):
+    validate_window(scheduled_at, fulfillment_type, products)
+    if fulfillment_type != 'delivery':
         return None, 0
     address = CustomerAddress.objects.filter(pk=address_id, user=user).first()
     if not address:

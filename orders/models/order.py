@@ -6,6 +6,10 @@ from django.db.models import Q
 
 
 class Order(models.Model):
+    class Source(models.TextChoices):
+        SITE = 'site', 'Site'
+        WHATSAPP = 'whatsapp', 'WhatsApp'
+
     class Status(models.TextChoices):
         WAITING = 'aguardando_confirmacao', 'Aguardando confirmação'
         CONFIRMED = 'confirmado', 'Confirmado'
@@ -23,7 +27,13 @@ class Order(models.Model):
         PICKUP = 'pickup', 'Retirada'
         DELIVERY = 'delivery', 'Entrega'
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='orders')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='orders',
+        null=True, blank=True,
+    )
+    source = models.CharField(max_length=16, choices=Source.choices, default=Source.SITE)
+    customer_name = models.CharField(max_length=160, blank=True)
+    customer_phone = models.CharField(max_length=20, blank=True)
     public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
     idempotency_key = models.UUIDField()
     request_digest = models.CharField(max_length=64)
