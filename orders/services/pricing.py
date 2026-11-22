@@ -1,9 +1,8 @@
 from decimal import Decimal
 
-from django.db.models import Prefetch
 from rest_framework.exceptions import ValidationError
 
-from catalog.models import Product, ProductOption
+from catalog.models import Product
 
 CENTS = Decimal('0.01')
 
@@ -11,7 +10,7 @@ CENTS = Decimal('0.01')
 def calculate_lines(lines):
     ids = [line['product_id'] for line in lines]
     products = {
-        product.id: product for product in Product.objects.select_for_update().filter(
+        product.id: product for product in Product.objects.filter(
             id__in=ids, is_active=True, is_available=True, category__is_active=True,
         ).prefetch_related('option_groups__options')
     }
