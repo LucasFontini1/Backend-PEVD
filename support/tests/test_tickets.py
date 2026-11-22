@@ -1,8 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils import timezone
+from uuid import uuid4
+from decimal import Decimal
 from rest_framework.test import APIClient
 
 from support.models import CommercialAudit, SupportMessage, SupportTicket
+from orders.models import Order
 
 User = get_user_model()
 
@@ -55,6 +59,34 @@ class TicketTests(TestCase):
         self.client.force_authenticate(user=self.a)
         self.assertEqual(self.client.post(f'/api/support/tickets/{pk}/messages/', {'message': 'Ainda aqui'}, format='json').status_code, 400)
         self.assertEqual(SupportTicket.objects.get(pk=pk).status, SupportTicket.Status.CLOSED)
+
+    def test_cannot_link_another_users_order(self):
+        private_order = Order.objects.create(
+            user=self.b, idempotency_key=uuid4(), request_digest='a' * 64,
+            fulfillment_type='pickup', scheduled_at=timezone.now(),
+            subtotal=Decimal('10.00'), total=Decimal('10.00'),
+        )
+        self.client.force_authenticate(user=self.a)
+        result = self.client.post('/api/support/tickets/', {
+            'subject': 'Pedido diferente', 'message': 'Quero consultar este pedido.',
+            'order_public_id': str(private_order.public_id),
+        }, format='json')
+        self.assertEqual(result.status_code, 400)
+        self.assertEqual(SupportTicket.objects.count(), 0)
+
+    def test_can_link_own_order_by_public_uuid(self):
+        own_order = Order.objects.create(
+            user=self.a, idempotency_key=uuid4(), request_digest='b' * 64,
+            fulfillment_type='pickup', scheduled_at=timezone.now(),
+            subtotal=Decimal('10.00'), total=Decimal('10.00'),
+        )
+        self.client.force_authenticate(user=self.a)
+        result = self.client.post('/api/support/tickets/', {
+            'subject': 'Pedido próprio', 'message': 'Gostaria de informações sobre entrega.',
+            'order_public_id': str(own_order.public_id),
+        }, format='json')
+        self.assertEqual(result.status_code, 201, result.data)
+        self.assertEqual(SupportTicket.objects.get(pk=result.data['id']).order_id, own_order.pk)
 
     def test_public_cannot_read_tickets(self):
         self.client.force_authenticate(user=None)
