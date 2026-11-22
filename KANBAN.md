@@ -9,6 +9,13 @@ A conexão GitHub disponível gerencia issues e PRs, mas não cria um GitHub Pro
 - [#21](https://github.com/LucasFontini1/Backend-PEVD/issues/21): dashboard real, loja configurável, banners e auditoria.
 - [PR #22](https://github.com/LucasFontini1/Backend-PEVD/pull/22): integrado na dev com CI Python 3.14 Ubuntu/Windows.
 
+## Refatoração e gestão comercial — integrado em dev (22/11/2026)
+- [#27](https://github.com/LucasFontini1/Backend-PEVD/issues/27): pedidos manuais WhatsApp para clientes sem conta; campos de contato sem senhas fictícias, itens e totais recalculados no servidor, opção de entrega/retirada, histórico, pagamento pendente, idempotência.
+- [#28](https://github.com/LucasFontini1/Backend-PEVD/issues/28): relatório de pedidos concluídos por data de conclusão com receitas declaradas pagas/pendentes e CSV.
+- Catálogo administrativo ganhou filtro server-side por nome; preços do navegador não são aceitos.
+- [PR #29](https://github.com/LucasFontini1/Backend-PEVD/pull/29): squash merge em dev. CI Python 3.14 Ubuntu/Windows, 92 testes aprovados.
+- [docs/MANUAL_ORDERS.md](docs/MANUAL_ORDERS.md): contrato e restrições.
+
 ## Em homologação / backlog
 - [#23](https://github.com/LucasFontini1/Backend-PEVD/issues/23): antispam distribuído, email real opcional, retenção/privacidade.
 - [#24](https://github.com/LucasFontini1/Backend-PEVD/issues/24): converter orçamento aceito em pedido apenas após confirmar valor/horário/entrega.
