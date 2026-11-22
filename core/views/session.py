@@ -17,10 +17,18 @@ from core.views.token import EmailOrUsernameTokenSerializer
 COOKIE_NAME = 'pv_refresh'
 
 
+class CsrfBootstrapView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        return Response({'csrf_token': get_token(request)})
+
+
 def set_refresh_cookie(response, token):
     response.set_cookie(
         COOKIE_NAME, token, httponly=True, secure=not settings.DEBUG,
-        samesite='Lax', max_age=7 * 24 * 60 * 60, path='/api/token/',
+        samesite='None' if not settings.DEBUG else 'Lax', max_age=7 * 24 * 60 * 60, path='/api/token/',
     )
 
 
@@ -44,7 +52,7 @@ class CookieLoginView(APIView):
         get_token(request)
         response.set_cookie(
             'pv_csrf', request.META['CSRF_COOKIE'], secure=not settings.DEBUG,
-            httponly=False, samesite='Lax', path='/',
+            httponly=False, samesite='None' if not settings.DEBUG else 'Lax', path='/',
         )
         return response
 
@@ -85,6 +93,6 @@ class CookieLogoutView(APIView):
             except TokenError:
                 pass
         response = Response(status=status.HTTP_204_NO_CONTENT)
-        response.delete_cookie(COOKIE_NAME, path='/api/token/', samesite='Lax')
-        response.delete_cookie('pv_csrf', path='/', samesite='Lax')
+        response.delete_cookie(COOKIE_NAME, path='/api/token/', samesite='None' if not settings.DEBUG else 'Lax')
+        response.delete_cookie('pv_csrf', path='/', samesite='None' if not settings.DEBUG else 'Lax')
         return response
