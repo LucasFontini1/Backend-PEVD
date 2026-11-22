@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,8 +48,8 @@ class DashboardView(APIView):
         ).exclude(status__in=[Order.Status.REJECTED, Order.Status.CANCELLED])
         lines = OrderItem.objects.filter(order__in=orders)
         top = list(lines.values('product_name_snapshot').annotate(
-            quantity=Sum('quantity'),
-        ).order_by('-quantity', 'product_name_snapshot')[:5])
+            order_count=Count('order_id', distinct=True),
+        ).order_by('-order_count', 'product_name_snapshot')[:5])
         tickets = apply_dates(SupportTicket.objects.all(), start, end)
         contacts = apply_dates(ContactInquiry.objects.all(), start, end)
         quotes = apply_dates(CustomQuote.objects.all(), start, end)

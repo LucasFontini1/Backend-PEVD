@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from orders.models import Order
+from orders.models import Order, OrderItem
 from support.models import ContactInquiry, SupportTicket
 
 User = get_user_model()
@@ -48,3 +48,32 @@ class DashboardTests(TestCase):
         self.assertEqual(result.data['contacts_count'], 1)
         self.assertEqual(result.data['open_tickets_count'], 1)
         self.assertEqual(self.client.get('/api/admin/dashboard/?start=not-a-date').status_code, 400)
+
+    def test_top_products_counts_distinct_orders_not_units(self):
+        common = {
+            'user': self.customer, 'request_digest': 'a' * 64,
+            'fulfillment_type': 'pickup', 'scheduled_at': timezone.now(),
+            'subtotal': Decimal('100.00'), 'total': Decimal('100.00'),
+        }
+        first = Order.objects.create(**common, idempotency_key=uuid4())
+        second = Order.objects.create(**common, idempotency_key=uuid4())
+        # Vinte unidades em um único pedido representam apenas um pedido.
+        OrderItem.objects.create(
+            order=first, product_name_snapshot='Brigadeiro',
+            quantity=20, unit_price='5.00', subtotal='100.00',
+        )
+        # Duas linhas do mesmo produto no mesmo pedido não devem contar duas vezes.
+        OrderItem.objects.create(
+            order=second, product_name_snapshot='Brownie',
+            quantity=1, unit_price='8.00', subtotal='8.00',
+        )
+        OrderItem.objects.create(
+            order=second, product_name_snapshot='Brownie',
+            quantity=2, unit_price='8.00', subtotal='16.00',
+        )
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.get('/api/admin/dashboard/')
+        self.assertEqual(response.status_code, 200, response.data)
+        ranked = {entry['product_name_snapshot']: entry['order_count'] for entry in response.data['top_products']}
+        self.assertEqual(ranked, {'Brigadeiro': 1, 'Brownie': 1})
+        self.assertNotIn('quantity', response.data['top_products'][0])
