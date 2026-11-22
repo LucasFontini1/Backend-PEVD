@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from catalog.models import ShopBrand
 from catalog.serializers import ShopBrandAdminSerializer, ShopBrandPublicSerializer
 from core.permissions import IsActiveSuperUser
+from support.services.audit import record_action
 
 
 class PublicBrandView(APIView):
@@ -26,5 +27,6 @@ class AdminBrandView(APIView):
         brand = ShopBrand.objects.first() or ShopBrand()
         serializer = ShopBrandAdminSerializer(brand, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        brand = serializer.save()
+        record_action(request.user, 'shop.update', brand)
         return Response(serializer.data)
