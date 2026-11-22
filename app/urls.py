@@ -22,7 +22,7 @@ from uploader.router import router as uploader_router
 router = DefaultRouter()
 router.register(r'usuarios', UserViewSet, basename='usuarios')
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    *([path(f'{settings.DJANGO_ADMIN_PATH}/', admin.site.urls)] if settings.DJANGO_ADMIN_PATH else []),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),

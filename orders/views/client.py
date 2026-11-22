@@ -28,7 +28,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     lookup_field = 'public_id'
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user).prefetch_related('items__options', 'history')
+        return Order.objects.filter(user=self.request.user).select_related('user').prefetch_related('items__options', 'history')
 
     @action(detail=False, methods=['post'], url_path='quote')
     def quote(self, request):

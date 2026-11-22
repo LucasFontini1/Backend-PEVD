@@ -70,7 +70,7 @@ class BlockedDateViewSet(AdminBase):
 
 class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsActiveSuperUser]
-    queryset = Order.objects.all().prefetch_related('items__options', 'history')
+    queryset = Order.objects.all().select_related('user').prefetch_related('items__options', 'history')
     serializer_class = AdminOrderSerializer
 
     @action(detail=False, methods=['post'], url_path='manual')

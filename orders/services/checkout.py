@@ -84,7 +84,8 @@ def create_order(user, payload):
         try:
             with transaction.atomic():
                 order = Order.objects.create(
-                    user=user, idempotency_key=key, request_digest=digest,
+                    user=user, customer_name=(user.name or '').strip() or user.username,
+                    idempotency_key=key, request_digest=digest,
                     fulfillment_type=payload['fulfillment_type'],
                     scheduled_at=payload['scheduled_at'], notes=payload['notes'],
                     address_snapshot=quote['address'], shipping=quote['shipping'],

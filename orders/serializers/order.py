@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from orders.models import Order, OrderItem, OrderItemOption, OrderStatusHistory
+from orders.services.customer_identity import customer_display_name
 
 
 class SnapshotOptionSerializer(serializers.ModelSerializer):
@@ -24,8 +25,12 @@ class HistorySerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    customer_name = serializers.SerializerMethodField()
     items = SnapshotItemSerializer(many=True, read_only=True)
     history = HistorySerializer(many=True, read_only=True)
+
+    def get_customer_name(self, obj):
+        return customer_display_name(obj)
 
     class Meta:
         model = Order
@@ -37,5 +42,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class AdminOrderSerializer(OrderSerializer):
+    customer_display_name = serializers.SerializerMethodField()
+
+    def get_customer_display_name(self, obj):
+        return customer_display_name(obj)
+
     class Meta(OrderSerializer.Meta):
-        fields = ['id', 'user', *OrderSerializer.Meta.fields]
+        fields = ['id', 'user', 'customer_display_name', *OrderSerializer.Meta.fields]
