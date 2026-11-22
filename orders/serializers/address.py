@@ -6,6 +6,8 @@ from orders.models import CustomerAddress
 
 
 class AddressSerializer(serializers.ModelSerializer):
+    zip_code = serializers.CharField(max_length=9)
+
     class Meta:
         model = CustomerAddress
         fields = [
