@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.permissions import IsActiveSuperUser
+from orders.models import Order
 from support.models import SupportMessage, SupportTicket
 from support.serializers.tickets import (
     AdminReplySerializer, ReplySerializer, TicketCreateSerializer, TicketSerializer,
@@ -32,7 +33,9 @@ class ClientTicketViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         ticket = SupportTicket.objects.create(
-            user=request.user, subject=data['subject'], order_id=data.get('order_id'),
+            user=request.user, subject=data['subject'],
+            order_id=(Order.objects.get(public_id=data['order_public_id'], user=request.user).pk
+                      if data.get('order_public_id') else None),
         )
         save_message(ticket, request.user, data['message'], SupportTicket.Status.OPEN)
         return Response(TicketSerializer(ticket).data, status=status.HTTP_201_CREATED)
