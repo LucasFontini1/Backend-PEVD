@@ -1,3 +1,5 @@
+> **Fase 2 — Catálogo:** consulte [docs/CATALOG_API.md](docs/CATALOG_API.md). O backend agora inclui `catalog` com categorias, produtos, imagens, opções e marca, endpoints públicos e CRUD superuser. Criar migrações com `pdm run migrate`. Os dados comerciais não são predefinidos; cadastro pela administração. Pedidos, checkout e atendimento permanecem nas próximas fases.
+
 > **Pensei em Você Doces — Fase 1 (branch FEAT-2):** este projeto deriva do template de LucasFontini1, preservando autoria e uploader. O contrato de autenticação da loja substitui a resposta JWT descrita abaixo: `POST /api/token/` devolve apenas `access` e guarda o refresh em cookie HttpOnly; detalhes em [docs/ENDPOINTS.md](docs/ENDPOINTS.md). Cadastro, login e autorização estão em validação; recuperação de senha, verificação de e-mail e rate limit de produção ainda não estão concluídos. **Não publicar/mesclar em main antes de revisar estes pontos.**
 
 # Template Django + Django REST Framework + PDM

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'uploader',
     'core',
+    'catalog',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -128,7 +129,7 @@ SIMPLE_JWT.update({
 })
 SPECTACULAR_SETTINGS.update({
     'TITLE': 'Pensei em Você Doces — API',
-    'DESCRIPTION': 'Autenticação e acesso comercial; catálogo e pedidos são fases futuras.',
+    'DESCRIPTION': 'Autenticação, catálogo e administração de produtos; pedidos são fase futura.',
 })
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
