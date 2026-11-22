@@ -26,7 +26,7 @@ class DashboardTests(TestCase):
         self.client.force_authenticate(user=self.admin)
         data = self.client.get('/api/admin/dashboard/').data
         self.assertEqual(data['orders_count'], 0)
-        self.assertEqual(data['recorded_paid_revenue'], '0')
+        self.assertEqual(data['recorded_paid_revenue'], '0.00')
         self.assertEqual(data['contacts_count'], 0)
 
     def test_only_marked_paid_orders_count_as_recorded_revenue(self):
