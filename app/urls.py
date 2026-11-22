@@ -5,6 +5,8 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from support.routers import public_router as support_public_router, client_router as support_client_router, admin_router as support_admin_router
+from support.views.public import ContactView
 from orders.routers import client_router as orders_client_router, admin_router as orders_admin_router
 from orders.views.schedule import ScheduleView
 from catalog.brand_views import AdminBrandView, PublicBrandView
@@ -34,6 +36,10 @@ urlpatterns = [
     path('api/admin/', include(catalog_admin_router.urls)),
     path('api/admin/', include(orders_admin_router.urls)),
     path('api/schedule/', ScheduleView.as_view(), name='schedule'),
+    path('api/contact/', ContactView.as_view(), name='public-contact'),
+    path('api/admin/', include(support_admin_router.urls)),
+    path('api/', include(support_public_router.urls)),
+    path('api/', include(support_client_router.urls)),
     path('api/', include(orders_client_router.urls)),
     path('api/', include(catalog_public_router.urls)),
     path('api/', include(router.urls)),
