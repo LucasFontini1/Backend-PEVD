@@ -7,7 +7,7 @@ NEXT = {
     Order.Status.WAITING: {Order.Status.CONFIRMED, Order.Status.REJECTED, Order.Status.CANCELLED},
     Order.Status.CONFIRMED: {Order.Status.PREPARING, Order.Status.CANCELLED},
     Order.Status.PREPARING: {Order.Status.READY},
-    Order.Status.READY: {Order.Status.COMPLETED},
+    Order.Status.READY: set(Order.Status.values) - {Order.Status.READY},
 }
 
 
@@ -33,6 +33,7 @@ def confirm_manual_payment(order_id, actor, reason):
         raise ValidationError({'payment_status': 'Pedido encerrado não pode ser quitado.'})
     if order.payment_status == Order.PaymentStatus.PAID:
         raise ValidationError({'payment_status': 'Pagamento já confirmado.'})
+    reason = reason.strip() or 'Confirmado pelo administrador sem motivo obrigatório'
     order.payment_status = Order.PaymentStatus.PAID
     order.save(update_fields=['payment_status'])
     OrderStatusHistory.objects.create(
