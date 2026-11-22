@@ -34,3 +34,8 @@ class OrderSerializer(serializers.ModelSerializer):
             'scheduled_at', 'notes', 'address_snapshot', 'shipping',
             'subtotal', 'total', 'created_at', 'items', 'history',
         ]
+
+
+class AdminOrderSerializer(OrderSerializer):
+    class Meta(OrderSerializer.Meta):
+        fields = ['id', 'user', *OrderSerializer.Meta.fields]
