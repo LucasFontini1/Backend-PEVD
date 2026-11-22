@@ -130,3 +130,39 @@ class CheckoutTests(TestCase):
         from orders.models import BlockedDate
         BlockedDate.objects.create(date=timezone.localtime(self.future).date())
         self.assertEqual(self.client.post('/api/orders/quote/', self.payload(), format='json').status_code, 400)
+
+    def test_delivery_fee_and_address_snapshot(self):
+        from orders.models import CustomerAddress, DeliveryZone
+        address = CustomerAddress.objects.create(
+            user=self.user, zip_code='89225000', street='Rua de teste',
+            number='10', district='Bairro', city='Joinville', state='SC',
+        )
+        DeliveryZone.objects.create(name='Região de teste', zip_prefix='892', fee='8.00')
+        BusinessHour.objects.update(delivery_enabled=True)
+        body = {**self.payload(), 'fulfillment_type': 'delivery', 'address_id': address.pk}
+        order = self.quote_and_order(body)
+        self.assertEqual(order.status_code, 201, order.data)
+        self.assertEqual(order.data['shipping'], '8.00')
+        self.assertEqual(order.data['total'], '39.00')
+        address.street = 'Rua alterada'
+        address.save(update_fields=['street'])
+        self.assertEqual(self.client.get('/api/orders/' + order.data['public_id'] + '/').data['address_snapshot']['street'], 'Rua de teste')
+
+    def test_admin_transitions_and_manual_payment_are_audited(self):
+        response = self.quote_and_order()
+        self.client.force_authenticate(user=self.staff)
+        pk = Order.objects.get(public_id=response.data['public_id']).pk
+        url = f'/api/admin/orders/{pk}/transitions/'
+        self.assertEqual(self.client.post(url, {'status': 'confirmado'}, format='json').status_code, 403)
+        self.client.force_authenticate(user=self.superuser)
+        self.assertEqual(self.client.post(url, {'status': 'pronto'}, format='json').status_code, 400)
+        done = self.client.post(url, {'status': 'confirmado', 'reason': 'Aceito'}, format='json')
+        self.assertEqual(done.status_code, 200, done.data)
+        self.assertEqual(done.data['status'], 'confirmado')
+        payment = self.client.post(
+            f'/api/admin/orders/{pk}/confirm-payment/',
+            {'reason': 'Comprovante verificado fora do site'}, format='json',
+        )
+        self.assertEqual(payment.status_code, 200, payment.data)
+        self.assertEqual(payment.data['payment_status'], 'pago')
+        self.assertEqual(Order.objects.get(pk=pk).history.count(), 3)
