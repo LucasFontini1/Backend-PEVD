@@ -109,6 +109,12 @@ class ShopBrand(models.Model):
     background_color = models.CharField(max_length=7, default='#FFF5E9')
     primary_color = models.CharField(max_length=7, default='#C96680')
     heading_color = models.CharField(max_length=7, default='#704438')
+    business_email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=24, blank=True)
+    pickup_address = models.CharField(max_length=240, blank=True)
+    instagram_url = models.URLField(blank=True)
+    announcement = models.CharField(max_length=220, blank=True)
+    response_hours = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.pk = 1
