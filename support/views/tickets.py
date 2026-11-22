@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -42,7 +42,6 @@ class ClientTicketViewSet(viewsets.ReadOnlyModelViewSet):
     def messages(self, request, pk=None):
         ticket = SupportTicket.objects.select_for_update().filter(user=request.user, pk=pk).first()
         if not ticket:
-            from rest_framework.exceptions import NotFound
             raise NotFound()
         if ticket.status == SupportTicket.Status.CLOSED:
             raise ValidationError({'status': 'Ticket encerrado não aceita novas mensagens.'})
