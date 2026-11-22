@@ -1,0 +1,19 @@
+[
+  {
+    "model": "core.user",
+    "pk": 900001,
+    "fields": {
+      "password": "!",
+      "last_login": null,
+      "is_superuser": true,
+      "email": "a@a.com",
+      "username": "admin.dev",
+      "name": "Administrador de desenvolvimento",
+      "foto": null,
+      "is_active": true,
+      "is_staff": true,
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]
