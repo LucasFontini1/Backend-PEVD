@@ -1,7 +1,6 @@
 import csv
 from datetime import date
 from decimal import Decimal
-from io import StringIO
 
 from django.http import HttpResponse
 from django.db.models import Sum
@@ -56,8 +55,8 @@ def completed_report(request):
         return response
     return Response({
         'orders_count': qs.count(), 'paid_count': paid.count(), 'unpaid_count': unpaid.count(),
-        'paid_total': str((paid.aggregate(v=Sum('total'))['v'] or Decimal('0')).quantize(Decimal('0.01'))),
-        'unpaid_total': str((unpaid.aggregate(v=Sum('total'))['v'] or Decimal('0')).quantize(Decimal('0.01'))),
+        'paid_total': str((paid.aggregate(v=Sum('total'))['v'] or Decimal(0)).quantize(Decimal('0.01'))),
+        'unpaid_total': str((unpaid.aggregate(v=Sum('total'))['v'] or Decimal(0)).quantize(Decimal('0.01'))),
         'results': [{
             'public_id': str(order.public_id), 'created_at': order.created_at,
             'source': order.source, 'customer_name': order.customer_name,
