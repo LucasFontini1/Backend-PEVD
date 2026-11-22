@@ -37,5 +37,14 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class AdminOrderSerializer(OrderSerializer):
+    customer_display_name = serializers.SerializerMethodField()
+
+    def get_customer_display_name(self, obj):
+        if obj.customer_name and obj.customer_name.strip():
+            return obj.customer_name.strip()
+        if obj.user_id and obj.user:
+            return (obj.user.name or '').strip() or obj.user.username
+        return 'Cliente não identificado'
+
     class Meta(OrderSerializer.Meta):
-        fields = ['id', 'user', *OrderSerializer.Meta.fields]
+        fields = ['id', 'user', 'customer_display_name', *OrderSerializer.Meta.fields]
