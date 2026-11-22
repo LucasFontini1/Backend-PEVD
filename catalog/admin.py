@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from catalog.models import Category, Product, ProductImage, ProductOption, ProductOptionGroup
+from catalog.models import Category, Product, ProductImage, ProductOption, ProductOptionGroup, ShopBrand
 
 
 @admin.register(Category)
@@ -44,3 +44,11 @@ class ProductImageAdmin(admin.ModelAdmin):
 @admin.register(ProductOptionGroup)
 class ProductOptionGroupAdmin(admin.ModelAdmin):
     list_display = ['product', 'name', 'required', 'multiple']
+
+
+@admin.register(ShopBrand)
+class ShopBrandAdmin(admin.ModelAdmin):
+    list_display = ['name', 'primary_color', 'background_color']
+
+    def has_add_permission(self, request):
+        return not ShopBrand.objects.exists()

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from catalog.models import Category, Product, ProductImage, ProductOption, ProductOptionGroup
+from catalog.models import Category, Product, ProductImage, ProductOption, ProductOptionGroup, ShopBrand
 from uploader.models import Image
 
 
@@ -131,3 +131,32 @@ class OptionAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOption
         fields = ['id', 'group', 'name', 'additional_price', 'is_active', 'sort_order']
+
+
+class ShopBrandPublicSerializer(serializers.ModelSerializer):
+    logo = ImagePublicSerializer(read_only=True)
+
+    class Meta:
+        model = ShopBrand
+        fields = ['name', 'logo', 'background_color', 'primary_color', 'heading_color']
+
+
+class ShopBrandAdminSerializer(ShopBrandPublicSerializer):
+    logo_attachment_key = serializers.SlugRelatedField(
+        source='logo', queryset=Image.objects.all(), slug_field='attachment_key',
+        write_only=True, required=False, allow_null=True,
+    )
+
+    class Meta(ShopBrandPublicSerializer.Meta):
+        fields = [*ShopBrandPublicSerializer.Meta.fields, 'logo_attachment_key']
+
+    def validate_logo_attachment_key(self, value):
+        return validate_image_ownership(value, self.context)
+
+    def validate(self, attrs):
+        import re
+        for key in ('background_color', 'primary_color', 'heading_color'):
+            color = attrs.get(key)
+            if color is not None and not re.fullmatch(r'#[0-9a-fA-F]{6}', color):
+                raise serializers.ValidationError({key: 'Utilize uma cor hexadecimal no formato #RRGGBB.'})
+        return attrs

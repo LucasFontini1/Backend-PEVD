@@ -5,6 +5,7 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from catalog.brand_views import AdminBrandView, PublicBrandView
 from catalog.routers import admin_router as catalog_admin_router, public_router as catalog_public_router
 from core.views import CustomTokenVerifyView, UserViewSet
 from core.views.commercial import CommercialAccessView
@@ -25,6 +26,8 @@ urlpatterns = [
     path('api/token/verify/', CustomTokenVerifyView.as_view(), name='token_verify'),
     path('api/registro/', StoreRegistrationView.as_view(), name='user_registration'),
     path('api/admin/access/', CommercialAccessView.as_view(), name='commercial_access'),
+    path('api/shop/settings/', PublicBrandView.as_view(), name='shop-settings'),
+    path('api/admin/shop-settings/', AdminBrandView.as_view(), name='admin-shop-settings'),
     path('api/media/', include(uploader_router.urls)),
     path('api/admin/', include(catalog_admin_router.urls)),
     path('api/', include(catalog_public_router.urls)),
